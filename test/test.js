@@ -287,7 +287,7 @@ QUnit.test("Utilities", function(assert) { "use strict";
 });
 
 QUnit.test("Role", function(assert) { "use strict";
-  assert.expect(18);
+  assert.expect(24);
 
   var Base = Constr.create({
     prototype: {
@@ -485,4 +485,44 @@ QUnit.test("Role", function(assert) { "use strict";
   var Constructor1 = Constr.create().include(Role);
 
   assert.ok(Constructor0.prototype.test0 === Constructor1.prototype.test0 && Constructor0.prototype.test1 === Constructor1.prototype.test1, "When a single role is included in multiple constructors, the constructors share the role's members");
+
+  /**********/
+
+  var bodyArgs;
+  Base = Constr.create({
+    body: function() {
+      bodyArgs = Array.prototype.slice.call(arguments);
+    },
+    prototype: {
+      test0: function() { return 'test0'; },
+      test1: function() { return 'test1'; }
+    }
+  });
+
+  ExtendedBase = Base.include(
+    Constr.createRole({
+      test: function() {}
+    })
+  );
+
+  obj = new ExtendedBase('test0', 'test1');
+
+  assert.deepEqual(bodyArgs, ['test0', 'test1'], 'constructor returned by .include() runs the original constructor with correct arguments');
+
+  ExtendedBase = Base.extend({
+    test1: function() { return 'test11'; },
+    test2: function() { return 'test22'; },
+  }).include(
+    Constr.createRole({
+      test2: function() { return 'test222'; },
+      test3: function() { return 'test333'; }
+    })
+  );
+
+  obj = new ExtendedBase('test00', 'test11');
+  assert.deepEqual(bodyArgs, ['test00', 'test11'], 'with an extended constructor with role applied, original constructor with correct arguments');
+  assert.strictEqual(obj.test0(), 'test0', 'with an extended constructor with role applied, method not overridden remains');
+  assert.strictEqual(obj.test1(), 'test11', 'with an extended constructor with role applied, method overridden by extension but not by role, extension version is used');
+  assert.strictEqual(obj.test2(), 'test222', 'with an extended constructor with role applied, method overridden by both extension and role, role version is used');
+  assert.strictEqual(obj.test3(), 'test333', 'role adds a method to an extended constructor');
 });
