@@ -61,7 +61,7 @@ QUnit.test("create", function(assert) { "use strict";
   });
 
   assert.strictEqual(Object.getPrototypeOf(C1.prototype), prototype, 'prototype chain is maintained on first extension');
-  var obj = new C1();
+  obj = new C1();
 
   assert.strictEqual(count, 2, 'body is executed when extended constructor is executed');
   assert.strictEqual(obj.test0(), 't0', 'object method is not overridden when not meant to be overridden');
@@ -82,7 +82,7 @@ QUnit.test("create", function(assert) { "use strict";
   });
 
   assert.ok(Object.getPrototypeOf(C2.prototype) === C1.prototype && Object.getPrototypeOf(Object.getPrototypeOf(C2.prototype)) === prototype, 'prototype chain is maintained on second extension');
-  var obj = new C2();
+  obj = new C2();
 
   assert.strictEqual(count, 3, 'body is executed when extended extended constructor is executed');
   assert.ok(obj.test0() === 't0' && obj.test1() === 't11', 'object method is not overridden when not meant to be overriddeni on second extension');
@@ -476,7 +476,7 @@ QUnit.test("Role", function(assert) { "use strict";
 
   var rolePrototype = {
     test0: function() {},
-    test1: function() {},
+    test1: function() {}
   };
 
   Role = Constr.createRole(rolePrototype);
