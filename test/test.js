@@ -511,7 +511,7 @@ QUnit.test("Role", function(assert) { "use strict";
 
   ExtendedBase = Base.extend({
     test1: function() { return 'test11'; },
-    test2: function() { return 'test22'; },
+    test2: function() { return 'test22'; }
   }).include(
     Constr.createRole({
       test2: function() { return 'test222'; },
