@@ -26,7 +26,7 @@ QUnit.test("create", function(assert) { "use strict";
 
   var count = 0;
   var args;
-  var prototype = {
+  var proto = {
     test0: function() { return 't0'; },
     test1: function() { return 't1'; }
   };
@@ -37,7 +37,7 @@ QUnit.test("create", function(assert) { "use strict";
   };
 
   C0 = Constr.create({
-    prototype: prototype,
+    proto: proto,
     staticMembers: staticMembers,
     body: function() {
       ++count;
@@ -45,7 +45,7 @@ QUnit.test("create", function(assert) { "use strict";
     }
   });
 
-  assert.strictEqual(C0.prototype, prototype, 'prototype is attached to constructor');
+  assert.strictEqual(C0.prototype, proto, 'prototype is attached to constructor');
   assert.ok(C0.static0 === staticMembers.static0 && C0.static1 === staticMembers.static1, 'static members are attached to constructor');
 
   var obj = new C0('foo', 'bar');
@@ -60,7 +60,7 @@ QUnit.test("create", function(assert) { "use strict";
     static2: function() { return 's22'; }
   });
 
-  assert.strictEqual(Object.getPrototypeOf(C1.prototype), prototype, 'prototype chain is maintained on first extension');
+  assert.strictEqual(Object.getPrototypeOf(C1.prototype), proto, 'prototype chain is maintained on first extension');
   obj = new C1();
 
   assert.strictEqual(count, 2, 'body is executed when extended constructor is executed');
@@ -81,7 +81,7 @@ QUnit.test("create", function(assert) { "use strict";
     static3: function() { return 's333'; }
   });
 
-  assert.ok(Object.getPrototypeOf(C2.prototype) === C1.prototype && Object.getPrototypeOf(Object.getPrototypeOf(C2.prototype)) === prototype, 'prototype chain is maintained on second extension');
+  assert.ok(Object.getPrototypeOf(C2.prototype) === C1.prototype && Object.getPrototypeOf(Object.getPrototypeOf(C2.prototype)) === proto, 'prototype chain is maintained on second extension');
   obj = new C2();
 
   assert.strictEqual(count, 3, 'body is executed when extended extended constructor is executed');
@@ -290,7 +290,7 @@ QUnit.test("Role", function(assert) { "use strict";
   assert.expect(24);
 
   var Base = Constr.create({
-    prototype: {
+    proto: {
       func: function() {
         return "Func";
       }
@@ -493,7 +493,7 @@ QUnit.test("Role", function(assert) { "use strict";
     body: function() {
       bodyArgs = Array.prototype.slice.call(arguments);
     },
-    prototype: {
+    proto: {
       test0: function() { return 'test0'; },
       test1: function() { return 'test1'; }
     }

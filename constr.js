@@ -94,7 +94,7 @@
   // constructor. The arguments are:
   //   body          - A function that is to be executed as the body of the 
   //                   returned constructor.
-  //   prototype     - The prototype to attach to the returned constructor.
+  //   proto         - The prototype to attach to the returned constructor.
   //   staticMembers - A object whose attributes will be copied to the constructor.
   //   enableExtend  - If true, .enableExtend() will be applied to the returned
   //                   constructor. True by default.
@@ -119,8 +119,8 @@
       NewConstructor = function() {};
     }
 
-    if (args.prototype) {
-      NewConstructor.prototype = args.prototype;
+    if (args.proto) {
+      NewConstructor.prototype = args.proto;
     }
 
     if (args.staticMembers) {

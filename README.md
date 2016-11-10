@@ -26,7 +26,7 @@ A boolean. When `true`, applies `enableRoles` on the created constructor. Defaul
 
 A function. Optional. The created constructor will pass its arguments to this body and execute it, where `this` is the newly constructed object, returning its results if any.
 
-#### options.prototype
+#### options.proto
 
 An Object. Optional. The created constructor will have this object as its `prototype`.
 
