@@ -22,7 +22,8 @@
   }
 
 })(this, function(exports) { "use strict";
-
+  var roleCache = {};
+  
   // Helper function. Copies all the properties from source to target.
   // Optionally pass into the args object an 'exclude' array, which
   // is an array of property names not to copy from source.
@@ -92,14 +93,17 @@
 
   // Public function. Takes a plain object of arguments and returns a
   // constructor. The arguments are:
-  //   body          - A function that is to be executed as the body of the 
-  //                   returned constructor.
-  //   proto         - The prototype to attach to the returned constructor.
-  //   staticMembers - A object whose attributes will be copied to the constructor.
-  //   enableExtend  - If true, .enableExtend() will be applied to the returned
-  //                   constructor. True by default.
-  //   enableRoles   - If true, .enableRoles() will be applied to the returned
-  //                   constructor. True by default.
+  //   body            - A function that is to be executed as the body of the 
+  //                     returned constructor.
+  //   proto           - The prototype to attach to the returned constructor.
+  //   instanceMembers - A object whose attributes will be copied to the
+  //                     prototype
+  //   staticMembers   - A object whose attributes will be copied to the
+  //                     constructor.
+  //   enableExtend    - If true, .enableExtend() will be applied to the
+  //                     returned constructor. True by default.
+  //   enableRoles     - If true, .enableRoles() will be applied to the returned
+  //                     constructor. True by default.
   exports.create = function(args) {
     var api = this;
 
@@ -121,6 +125,10 @@
 
     if (args.proto) {
       NewConstructor.prototype = args.proto;
+    }
+
+    if (args.instanceMembers) {
+      extend(NewConstructor.prototype, args.instanceMembers);
     }
 
     if (args.staticMembers) {
@@ -164,10 +172,17 @@
     BaseConstructor.extend = function(prototypeProperties, functionProperties) {
       var ParentConstructor = this;
 
-      // The base constructor should always be run.      
-      var ExtendedConstructor = function() {
-        BaseConstructor.apply(this, arguments);
-      }
+      // The base constructor should always be run, unless we are supplied with
+      // an alternative constructor
+      var ExtendedConstructor = (
+        prototypeProperties 
+        && prototypeProperties.hasOwnProperty('constructor')
+      )
+        ? prototypeProperties.constructor
+        : function() {
+          BaseConstructor.apply(this, arguments);
+        }
+      ;
       
       // We want to set up the prototype chain without actually running the
       // original constructor, so create a constructor for what is to be
@@ -186,14 +201,20 @@
       // Create the new prototype. The prototype chain is correctly set up.
       ExtendedConstructor.prototype = new ExtendedPrototype();
       
+      // Be sure the objects created from the extended constructor always point
+      // back to the constructor.
+      ExtendedConstructor.prototype.constructor = ExtendedConstructor;
+
       // Copy non-instance properties to the new constructor, as appropriate.
-      // Don't copy 'constructor' and 'prototype' because these are special.
-      extend(ExtendedConstructor, ParentConstructor, { exclude: ['constructor', 'prototype'] });
+      // Don't copy 'prototype' because it is special.
+      extend(ExtendedConstructor, ParentConstructor, { exclude: ['prototype'] });
       
       if (functionProperties) {
-        extend(ExtendedConstructor, functionProperties, { exclude: ['constructor', 'prototype'] });
+        extend(ExtendedConstructor, functionProperties, { exclude: ['prototype'] });
       }
 
+      // Add a __super__ static member which points to the parent's prototype
+      ExtendedConstructor.__super__ = ParentConstructor.prototype;
       return ExtendedConstructor;
     };
 
@@ -204,8 +225,6 @@
   // Public function. Given a constructor function, attaches a .include() method.
   // Returns the constructor function.
   exports.enableRoles = function (BaseConstructor) {
-    var roleCache = {};
-
     // Takes as its arguments a one or more Roles (not an array of Roles).
     // Returns a constructor that is a 'child' of the given constructor. The
     // 'child' constructor has a prototype chain that correctly runs from the

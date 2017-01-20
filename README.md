@@ -30,6 +30,10 @@ A function. Optional. The created constructor will pass its arguments to this bo
 
 An Object. Optional. The created constructor will have this object as its `prototype`.
 
+#### options.instanceMembers
+
+An Object. Optional. This object's properties will be copied onto the created constructor's properties. If `proto` is specified, the properties will be copied onto `proto`.
+
 #### options.staticMembers
 
 An Object. Optional. This object's properties will be copied onto the created constructor.

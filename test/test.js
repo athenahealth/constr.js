@@ -1,5 +1,5 @@
 QUnit.test("create", function(assert) { "use strict";
-  assert.expect(33);
+  assert.expect(44);
 
   var C0 = Constr.create();
   
@@ -22,11 +22,35 @@ QUnit.test("create", function(assert) { "use strict";
   assert.ok(C0.extend, 'has .extend() method by default when enableRoles is set to false');
   assert.notOk(C0.include, 'does not have .include() method when enableRoles is set to false');
 
+  var instanceMember = {};
+
+  C0 = Constr.create({
+    instanceMembers: {
+      instanceMember: instanceMember
+    }
+  });
+
+  assert.strictEqual(C0.prototype.instanceMember, instanceMember, 'instanceMembers are copied onto the prototype');
+  
+  var obj = new C0();
+  assert.strictEqual(obj.constructor, C0, "when proto is not specified, object's constructor property is the constructor");
+
+  var proto = {};
+
+  C0 = Constr.create({
+    proto: proto,
+    instanceMembers: {
+      instanceMember: instanceMember
+    }
+  });
+
+  assert.strictEqual(C0.prototype.instanceMember, proto.instanceMember, 'instanceMembers are copied onto the prototype, even when the prototype is specified');
+
   /**********/
 
   var count = 0;
   var args;
-  var proto = {
+  proto = {
     test0: function() { return 't0'; },
     test1: function() { return 't1'; }
   };
@@ -48,7 +72,7 @@ QUnit.test("create", function(assert) { "use strict";
   assert.strictEqual(C0.prototype, proto, 'prototype is attached to constructor');
   assert.ok(C0.static0 === staticMembers.static0 && C0.static1 === staticMembers.static1, 'static members are attached to constructor');
 
-  var obj = new C0('foo', 'bar');
+  obj = new C0('foo', 'bar');
   assert.strictEqual(count, 1, 'body is executed when object is constructed');
   assert.deepEqual(args, ['foo', 'bar'], 'arguments correctly passed to body');
 
@@ -72,6 +96,7 @@ QUnit.test("create", function(assert) { "use strict";
   assert.strictEqual(C1.static2(), 's22', 'static method is added in extended prototype');
   assert.strictEqual(C0.static1(), 's1', 'static method does not override that of the parent constructor');
   assert.notOk(C0.static2, 'static method is not added to parent constructor');
+  assert.strictEqual(obj.constructor, C1, 'object has a constructor property that is the extended constructor');
 
   var C2 = C1.extend({
     test2: function() { return 't222'; },
@@ -91,7 +116,36 @@ QUnit.test("create", function(assert) { "use strict";
   assert.ok(C2.static0() === 's0' && C2.static1() === 's11', 'static method is not overridden when not meant to be overriddeni on second extension');
   assert.strictEqual(C2.static2(), 's222', 'static method is overridden when supposed to be overridden on second extension');
   assert.strictEqual(C2.static3(), 's333', 'static method is added in extended prototype on second extension');
+  assert.strictEqual(obj.constructor, C2, 'object has a constructor property that is the extended extended constructor');
 
+  assert.ok(C2.__super__ === C1.prototype && C1.__super__ === C0.prototype, '__super__ of extended constructor is parent constructor');
+
+  /**********/
+
+  var fn = function() { 
+    assert.ok(true, 'when extending with a specified constructor, that constructor is executed when object is instantiated'); 
+  };
+  
+  C0 = Constr.create({
+    proto: {
+      test0: function() { return 't0'; }	  
+    }
+  });
+
+  C1 = C0.extend({
+    constructor: fn,
+    test1: function() { return 't11'; }
+  });
+
+  assert.strictEqual(C1, fn, 'when a constructor is extended and a constructor property is specified in the extension, the returned constructor is the constructor property');
+  
+  obj = new C1();
+
+  assert.strictEqual(obj.test1(), 't11', 'object has method specified in the extension when the extension has a constructor property');
+  assert.strictEqual(obj.test0(), 't0', 'object has method inherited from base constructor when the extension has a constructor property');
+  
+  assert.ok(Object.getPrototypeOf(obj) === C1.prototype && Object.getPrototypeOf(Object.getPrototypeOf(obj)) === C0.prototype, 'prototype chain is maintained when extension has constructor property');
+  
   /**********/
 
   var ret = {};
