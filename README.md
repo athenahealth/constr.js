@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/athenahealth/constr.js.svg?branch=master)](https://travis-ci.org/athenahealth/constr.js)
+
 # constr.js
 
 A set of tools to facilitate object-oriented JavaScript programming, supporting both inheritance and composition.
