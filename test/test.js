@@ -1,5 +1,5 @@
 QUnit.test("create", function(assert) { "use strict";
-  assert.expect(44);
+  assert.expect(48);
 
   var C0 = Constr.create();
   
@@ -119,6 +119,11 @@ QUnit.test("create", function(assert) { "use strict";
   assert.strictEqual(obj.constructor, C2, 'object has a constructor property that is the extended extended constructor');
 
   assert.ok(C2.__super__ === C1.prototype && C1.__super__ === C0.prototype, '__super__ of extended constructor is parent constructor');
+
+  assert.ok(obj instanceof C2, 'object is instanceof its constructor');
+  assert.ok(obj instanceof C1, 'object is instanceof the parent of the constructor');
+  assert.ok(obj instanceof C0, 'object is instanceof of the base constructor');
+  assert.ok(!(obj instanceof Constr.create()), 'object is not instance of arbitrary constructor');
 
   /**********/
 
@@ -341,7 +346,7 @@ QUnit.test("Utilities", function(assert) { "use strict";
 });
 
 QUnit.test("Role", function(assert) { "use strict";
-  assert.expect(24);
+  assert.expect(28);
 
   var Base = Constr.create({
     proto: {
@@ -389,6 +394,9 @@ QUnit.test("Role", function(assert) { "use strict";
   assert.strictEqual(obj.func(), 'Func1', 'Role correctly overrides base method.');
   assert.strictEqual(obj.test(), 'Test', 'role method is still correctly included, even when another of its method overrides a base method.');
 
+  assert.ok(obj instanceof BaseWithOverridingRole, 'object is instanceof constructor which includes role');
+  assert.ok(obj instanceof Base, 'object is instanceof constructor in its form before it includes role');
+
   /**********/
 
   var ExtendedBase = Base.include(
@@ -406,6 +414,9 @@ QUnit.test("Role", function(assert) { "use strict";
   obj = new ExtendedBase();
   assert.strictEqual(obj.func(), 'Func', 'base method is still intact after .include() and .extend().');
   assert.strictEqual(obj.test(), 'Test1', 'role method is still correctly overriden by .extend().');
+
+  assert.ok(obj instanceof ExtendedBase, 'object is instanceof constructor which extends a constructor which includes role');
+  assert.ok(obj instanceof Base, 'object is instanceof constructor in its form before it includes role and is extended');
 
   /**********/
 
