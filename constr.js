@@ -353,6 +353,65 @@
     return debouncedFunction;
   };
 
+  // Public function. Given a method and an interval (in milliseconds), returns
+  // a throttled version of the method. The method will execute at most once in
+  // the given interval for instance the method is attached to, even if it is
+  // invoked more times in that period. When a method is invoked more than
+  // during the interval, at the end of the interval, the latest invocation
+  // of that interval will be executed. The throttling of a method for one
+  // object has no effect on the throttling of that method for another
+  // object. (This is the notable difference from Underscore's throttle.)
+  exports.throttle = function(func, interval) {
+    var methodID = sequence();
+
+    return function() {
+      if (!this.hasOwnProperty('_throttle')) {
+        this._throttle = {};
+      }
+      
+      // Executes func and tracks the timestamp.
+      function exec() {
+        this._throttle[methodID] = {
+          previous: (new Date()).getTime()
+        };
+        func.apply(this, arguments);
+      }
+
+      if (this._throttle.hasOwnProperty(methodID)) {
+        // Calculate how much time is left in the current interval before we can
+        // execute again. Negative remaining means we are already outside the
+        // interval and can execute.
+        var remaining = interval - ((new Date()).getTime() - this._throttle[methodID].previous);
+        
+        if (remaining > 0) {
+          // The invocation that will be executed is always the latest one in
+          // the interval, so always save the arguments.
+          this._throttle[methodID].pendingArguments = arguments;
+          
+          // If we aren't already waiting to execute...
+          if (!this._throttle[methodID].pending) {
+            this._throttle[methodID].pending = true;
+            
+            // Wait for as much time as is remaining in the interval,
+            // and then execute the invocation using the latest arguments.
+            var obj = this;
+            setTimeout(function() {
+              exec.apply(obj, obj._throttle[methodID].pendingArguments);
+            }, remaining);
+          }
+        }
+        else {
+          exec.apply(this, arguments);
+        }
+      }
+      else {
+        // If this is the first time we've ever invoked the method on this
+        // instance, just go ahead and execute it.
+        exec.apply(this, arguments);
+      }
+    };
+  };
+
   // Public function. Given a method and optionally a hashing method, returns
   // a memoized version of the function. Results are cached in the object, as
   // opposed to Underscore's memoize, where results are cached globally.

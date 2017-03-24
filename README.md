@@ -84,6 +84,10 @@ Similar to [Underscore's memoize function](http://underscorejs.org/#memoize), ex
 
 Returns the base role.
 
+### throttle(method[, interval])
+
+Given a method and an interval (in milliseconds), returns a throttled version of the method. The method will execute at most once in the given interval for the object the method is attached to, even if it is invoked more times in that period. When a method is invoked more than once during the interval, at the end of the interval, the latest invocation of that interval will be executed. The throttling of a method for one object has no effect on the throttling of that method for another object. This is a notable difference from [Underscore's throttle](http://underscorejs.org/#throttle).
+
 ## Author
 
 Raymond Lam (rlam@athenahealth.com)

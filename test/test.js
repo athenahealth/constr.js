@@ -159,7 +159,7 @@ QUnit.test("create", function(assert) { "use strict";
 });
 
 QUnit.test("Utilities", function(assert) { "use strict";
-  assert.expect(37);
+  assert.expect(40);
 
   var ready = assert.async();
 
@@ -340,6 +340,55 @@ QUnit.test("Utilities", function(assert) { "use strict";
   assert.strictEqual(result, memoizeTestObj0.memoizedMethod('foo', 'baz') , 'memoize with hasher which ignores one of the arguments, correct value is returned when memoized method is called for the second time with ignored argument changed');
   assert.strictEqual(memoizeCount, 1, 'memoize with hasher which ignores one of the arguments, method is called once when memoized method is called a second time with only the ignored argument changed');
   
+  /**********/
+
+  
+  var throttleTestObj0 = {
+    throttleMethod0Results: [],
+    throttledMethod0: Constr.throttle(function(value) {
+      this.throttleMethod0Results.push(value);
+    }, 500)
+  };
+
+  throttleTestObj0.throttledMethod0(0);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(1) }, 100);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(2) }, 200);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(3) }, 300);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(4) }, 400);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(6) }, 600);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(7) }, 700);
+  setTimeout(function() { throttleTestObj0.throttledMethod0(16) }, 1600);
+  setTimeout(function() { assert.deepEqual(throttleTestObj0.throttleMethod0Results, [0, 4, 7, 16], 'when throttled method is invoked multiple times within given interval, first invocation and latest invocation within the interval are executed, and after the interval, invocation is executed'); }, 1700);
+
+  var throttleTestObj1 = {
+    throttleMethod0Results: [],
+    throttledMethod0: throttleTestObj0.throttledMethod0,
+    throttleMethod1Results: [],
+    throttledMethod1: Constr.throttle(function(value) {
+      this.throttleMethod1Results.push(value);
+    }, 500)
+  };
+  
+  throttleTestObj1.throttledMethod0(0);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(1) }, 100);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(2) }, 200);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(3) }, 300);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(4) }, 400);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(6) }, 600);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(7) }, 700);
+  setTimeout(function() { throttleTestObj1.throttledMethod0(16) }, 1600);
+  setTimeout(function() { assert.deepEqual(throttleTestObj1.throttleMethod0Results, [0, 4, 7, 16], 'throttling of method in one instance does not interfere with throttling of that method in different instance'); }, 1700);
+  
+  throttleTestObj1.throttledMethod1(0);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(1) }, 100);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(2) }, 200);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(3) }, 300);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(4) }, 400);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(6) }, 600);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(7) }, 700);
+  setTimeout(function() { throttleTestObj1.throttledMethod1(16) }, 1600);
+  setTimeout(function() { assert.deepEqual(throttleTestObj1.throttleMethod1Results, [0, 4, 7, 16], 'throttling of one method does not interfere with throttling of another'); }, 1700);
+ 
   /**********/
  
   setTimeout(ready, 3000);
