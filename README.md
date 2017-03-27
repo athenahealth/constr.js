@@ -56,13 +56,13 @@ Calling a debounced method for one object has no effect on the invocation for th
 
 ### enableExtend(constructor)
 
-Attaches an `extend` method to a constructor. `extend` is a way of establishing inheritance hierarchies of constructors and their prototypes, maintaining the correct `prototype` chain from a constructor all the way up to through its ancestors.
+Attaches an `extend` method to a constructor. `extend` is a way of establishing inheritance hierarchies of constructors and their prototypes, maintaining the correct `prototype` chain from a constructor all the way up to through its ancestors. Returns the constructor.
 
 `extend` optionally takes 2 Objects as its arguments. It returns a constructor that is a 'child' of the given constructor. The first argument's properties are copied onto the 'child' constructor's `prototype`, and this `prototype`'s protototype is the given constructor's `prototype`. The given constructor's 'static members' (properties) are also copied onto the 'child' constructor, and subsequently the properties of the second argument to `extend` are also copied onto the 'child' constructor as 'static members', possibly overriding ones that already exist. The 'child' constructor will inherit the given constructor's `extend` and (if applicable) `include` methods, so 'child' constructors can be likewise extended, and so forth, and each subsequent 'descendent' constructor will have a `prototype` chain that correctly leads up to through all the ancestor constructors to the original constructor on which `enableExtend` was invoked. Every 'descendent' constructor will execute the original constructor on the newly constructed object.
 
 ### enableInclude(constructor)
 
-Attaches an `include` method to a constructor, enabling a sort of 'mixin' functionality.
+Attaches an `include` method to a constructor, enabling a sort of 'mixin' functionality. Returns the constructor.
 
 `include` takes 0 or more roles as its arguments. A role is a special type of constructor with a `prototype` chain which instantiates a role API object. (There is actually nothing really special about a role -- it is just an empty constructor function with a `prototype` -- except that every role has a unique id used to cache the corresponding role API objects so that they do not have to be repeatedly constructed.) `include` first `extend`s the given constructor, and then copies each member of each of the given roles' API objects onto the 'child' constructor's `prototype`. This composed 'child' constructor is returned, if there are no naming conflicts between the different roles' members. (Otherwise, an error is thrown.)
 

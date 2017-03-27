@@ -1,7 +1,10 @@
 QUnit.test("create", function(assert) { "use strict";
-  assert.expect(48);
+  assert.expect(49);
 
-  var C0 = Constr.create();
+  var C0 = function() {};
+  assert.strictEqual(Constr.enableExtend(C0), C0, '.enableExtend() returns constructor it was given');
+
+  C0 = Constr.create();
   
   assert.ok(C0.extend, 'has .extend() method by default');
   assert.ok(C0.include, 'has .include() method by default');
@@ -395,9 +398,12 @@ QUnit.test("Utilities", function(assert) { "use strict";
 });
 
 QUnit.test("Role", function(assert) { "use strict";
-  assert.expect(28);
+  assert.expect(29);
 
-  var Base = Constr.create({
+  var Base = function() {};
+  assert.strictEqual(Constr.enableRoles(Base), Base, '.enableRoles() returns the constructor it was given');
+
+  Base = Constr.create({
     proto: {
       func: function() {
         return "Func";

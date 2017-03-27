@@ -279,6 +279,8 @@
         return NewConstructor;
       }
     };
+
+    return BaseConstructor;
   },
 
   // Public function. Returns the base Role.
