@@ -162,7 +162,7 @@ QUnit.test("create", function(assert) { "use strict";
 });
 
 QUnit.test("Utilities", function(assert) { "use strict";
-  assert.expect(40);
+  assert.expect(41);
 
   var ready = assert.async();
 
@@ -312,8 +312,13 @@ QUnit.test("Utilities", function(assert) { "use strict";
   assert.strictEqual(memoizeTestObj0.memoizedMethod('foo', 'bar'), result, 'memoize with hasher, if a method called on an arg the second time returns the value as that of the first call');
   assert.strictEqual(memoizeCount, 1, 'memoize with hasher, if a memoized method is called on the same argument twice, the method is only executed once');
 
+  var otherMemoziedMethodExecuted;
   var memoizeTestObj1 = {
-    memoizedMethod: memoizeTestObj0.memoizedMethod
+    memoizedMethod: memoizeTestObj0.memoizedMethod,
+    otherMemoizedMethod: Constr.memoize(function(val) {
+      otherMemoziedMethodExecuted = true;
+      return val + 'bar';
+    })
   };
 
   assert.strictEqual(memoizeTestObj1.memoizedMethod('foo', 'bar'), 'foobar', 'memoize with hasher, correct value is returned when memoized method is called for the first time for a different object');
@@ -328,6 +333,11 @@ QUnit.test("Utilities", function(assert) { "use strict";
   assert.strictEqual(memoizeTestObj1.memoizedMethod('foo', 'baz'), 'foobaz', 'memoize with hasher, correct value is returned when memoized method is called on a different argument');
   assert.strictEqual(memoizeCount, 3, 'memoize with hasher, method is executed when memoized methoid is called on a different argument');
 
+  memoizeTestObj1.otherMemoizedMethod('foo', 'baz');
+  otherMemoziedMethodExecuted = false;
+  memoizeTestObj1.memoizedMethod('foo', 'baz');
+  assert.ok(memoizeTestObj1.otherMemoizedMethod('foo', 'baz') === 'foobar' &&  memoizeTestObj1.memoizedMethod('foo', 'baz') === 'foobaz' && memoizeCount == 3 && otherMemoziedMethodExecuted === false, 'memoization of one method does not interfere with memoization of another method');
+  
   memoizeCount = 0;
   
   memoizeTestObj0 = {
