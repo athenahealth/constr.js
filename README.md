@@ -80,7 +80,7 @@ Returns a memoized version of the given method. The method's result is cached in
 
 Similar to [Underscore's memoize function](http://underscorejs.org/#memoize), except that with Underscore, `memoize` does not utilize the attached object as its cache store, so when two objects share the same Underscore memoized method, they also share the same cached values of that method.
 
-### role
+### role()
 
 Returns the base role.
 
