@@ -1,6 +1,6 @@
-//     constr.js
+//     constr.js 2.0.0
 //     https://github.com/athenahealth/constr.js
-//     (c) 2015 athenahealth, Inc.
+//     (c) 2015-2017 athenahealth, Inc.
 //
 //     Author: Raymond Lam (rlam@athenahealth.com)
 //
