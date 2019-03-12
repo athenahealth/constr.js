@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/athenahealth/constr.js.svg?branch=master)](https://travis-ci.org/athenahealth/constr.js)
+[![Build Status](https://travis-ci.com/athenahealth/constr.js.svg?branch=master)](https://travis-ci.com/athenahealth/constr.js)
 
 # constr.js
 
